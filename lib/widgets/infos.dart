@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:movies/models/actor.dart';
 import 'package:movies/models/movie.dart';
 import 'package:movies/utils/utils.dart';
 
 class Infos extends StatelessWidget {
-  const Infos({super.key, required this.movie});
-  final Movie movie;
+  const Infos({super.key, required this.actor});
+  final Actor actor;
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -17,7 +18,7 @@ class Infos extends StatelessWidget {
           SizedBox(
             width: 200,
             child: Text(
-              movie.title,
+              actor.name,
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w400,
@@ -35,9 +36,9 @@ class Infos extends StatelessWidget {
                     width: 5,
                   ),
                   Text(
-                    movie.voteAverage == 0.0
+                    actor.popularity == 0.0
                         ? 'N/A'
-                        : movie.voteAverage.toString(),
+                        : actor.popularity.toString(),
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w200,
@@ -48,12 +49,12 @@ class Infos extends StatelessWidget {
               ),
               Row(
                 children: [
-                  SvgPicture.asset('assets/Ticket.svg'),
+                  Icon(Icons.location_city,color:Colors.white),
                   const SizedBox(
                     width: 5,
                   ),
                   Text(
-                    Utils.getGenres(movie),
+                    actor.placeOfBirth,
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w200,
@@ -68,7 +69,7 @@ class Infos extends StatelessWidget {
                     width: 5,
                   ),
                   Text(
-                    movie.releaseDate.split('-')[0],
+                    actor.birthday,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w200,

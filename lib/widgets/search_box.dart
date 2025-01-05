@@ -13,7 +13,7 @@ class SearchBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: Get.find<SearchController1>().searchController,
+      controller: Get.find<SearchController1>().textSearchController,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         suffixIcon: IconButton(

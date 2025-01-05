@@ -2,9 +2,11 @@ import 'package:fade_shimmer/fade_shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:movies/api/api.dart';
+import 'package:movies/controllers/actors_controller.dart';
 import 'package:movies/controllers/bottom_navigator_controller.dart';
 import 'package:movies/controllers/movies_controller.dart';
 import 'package:movies/screens/details_screen.dart';
+import 'package:movies/screens/details_screen_actor.dart';
 import 'package:movies/widgets/infos.dart';
 
 class WatchList extends StatelessWidget {
@@ -46,19 +48,19 @@ class WatchList extends StatelessWidget {
                 const SizedBox(
                   height: 30,
                 ),
-                if (Get.find<MoviesController>().watchListMovies.isNotEmpty)
-                  ...Get.find<MoviesController>().watchListMovies.map(
-                        (movie) => Column(
+                if (Get.find<ActorsController>().favouriteListActors.isNotEmpty)
+                  ...Get.find<ActorsController>().favouriteListActors.map(
+                        (actor) => Column(
                           children: [
                             GestureDetector(
-                              onTap: () => Get.to(DetailsScreen(movie: movie)),
+                              onTap: () => Get.to(DetailsScreenActor(actor: actor)),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(16),
                                     child: Image.network(
-                                      Api.imageBaseUrl + movie.posterPath,
+                                      Api.imageBaseUrl + actor.profilePath,
                                       height: 180,
                                       width: 100,
                                       fit: BoxFit.cover,
@@ -81,7 +83,7 @@ class WatchList extends StatelessWidget {
                                   const SizedBox(
                                     width: 5,
                                   ),
-                                  Infos(movie: movie)
+                                  Infos(actor: actor)
                                 ],
                               ),
                             ),
@@ -91,14 +93,14 @@ class WatchList extends StatelessWidget {
                           ],
                         ),
                       ),
-                if (Get.find<MoviesController>().watchListMovies.isEmpty)
+                if (Get.find<ActorsController>().favouriteListActors.isEmpty)
                   const Column(
                     children: [
                       SizedBox(
                         height: 200,
                       ),
                       Text(
-                        'No movies in your watch list',
+                        'No actors in your watch list',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w200,

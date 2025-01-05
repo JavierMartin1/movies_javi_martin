@@ -1,20 +1,23 @@
 import 'package:fade_shimmer/fade_shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:movies/api/api.dart';
+import 'package:movies/models/actor.dart';
 import 'package:movies/models/movie.dart';
 import 'package:movies/screens/details_screen.dart';
+import 'package:movies/screens/details_screen_actor.dart';
 
-class TabBuilder extends StatelessWidget {
-  const TabBuilder({
+class TabBuilderActor extends StatelessWidget {
+  const TabBuilderActor({
     required this.future,
     super.key,
   });
-  final Future<List<Movie>?> future;
+  final Future<List<Actor>?> future;
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 12.0, left: 12.0),
-      child: FutureBuilder<List<Movie>?>(
+      child: FutureBuilder<List<Actor>?>(
         future: future,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
@@ -30,12 +33,13 @@ class TabBuilder extends StatelessWidget {
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) => GestureDetector(
                 onTap: () {
-                  Get.to(DetailsScreen(movie: snapshot.data![index]));
+                  Get.to(DetailsScreenActor(actor: snapshot.data![index]));
                 },
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: Image.network(
-                    'https://image.tmdb.org/t/p/w500/${snapshot.data![index].posterPath}',
+
+                    Api.imageBaseUrl+snapshot.data![index].profilePath,
                     height: 300,
                     width: 180,
                     fit: BoxFit.cover,

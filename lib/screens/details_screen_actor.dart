@@ -4,21 +4,24 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:movies/api/api.dart';
 import 'package:movies/api/api_service.dart';
+import 'package:movies/controllers/actors_controller.dart';
 import 'package:movies/controllers/movies_controller.dart';
+import 'package:movies/models/actor.dart';
 
 import 'package:movies/models/movie.dart';
 import 'package:movies/models/review.dart';
 import 'package:movies/utils/utils.dart';
+import 'package:movies/widgets/tab_builder.dart';
 
-class DetailsScreen extends StatelessWidget {
-  const DetailsScreen({
+class DetailsScreenActor extends StatelessWidget {
+  const DetailsScreenActor({
     super.key,
-    required this.movie,
+    required this.actor,
   });
-  final Movie movie;
+  final Actor actor;
   @override
   Widget build(BuildContext context) {
-    ApiService.getMovieReviews(movie.id);
+    //ApiService.getMovieReviews(actor.id);
     return SafeArea(
       child: Scaffold(
         body: SingleChildScrollView(
@@ -27,7 +30,7 @@ class DetailsScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(left: 24, right: 24, top: 34),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     IconButton(
@@ -43,6 +46,30 @@ class DetailsScreen extends StatelessWidget {
                       style: TextStyle(
                         fontWeight: FontWeight.w400,
                         fontSize: 24,
+                      ),
+                    ),
+                    Tooltip(
+                      message: 'Save this movie to your watch list',
+                      triggerMode: TooltipTriggerMode.tap,
+                      child: IconButton(
+                        onPressed: () {
+                          Get.find<ActorsController>().addToFavouriteList(actor);
+                        
+                        },
+                        icon: Obx(
+                          () =>
+                              Get.find<ActorsController>().isInFavouriteList(actor)
+                                  ? const Icon(
+                                      Icons.favorite,
+                                      color: Colors.white,
+                                      size: 33,
+                                    )
+                                  : const Icon(
+                                      Icons.favorite_outline,
+                                      color: Colors.white,
+                                      size: 33,
+                                    ),
+                        ),
                       ),
                     ),
                   ],
@@ -61,7 +88,7 @@ class DetailsScreen extends StatelessWidget {
                         bottomRight: Radius.circular(16),
                       ),
                       child: Image.network(
-                        Api.imageBaseUrl + movie.backdropPath,
+                        Api.imageBaseUrl + actor.profilePath,
                         width: Get.width,
                         height: 250,
                         fit: BoxFit.cover,
@@ -91,7 +118,7 @@ class DetailsScreen extends StatelessWidget {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(16),
                           child: Image.network(
-                            'https://image.tmdb.org/t/p/w500/${movie.posterPath}',
+                            Api.imageBaseUrl + actor.profilePath,
                             width: 110,
                             height: 140,
                             fit: BoxFit.cover,
@@ -115,7 +142,7 @@ class DetailsScreen extends StatelessWidget {
                       child: SizedBox(
                         width: 230,
                         child: Text(
-                          movie.title,
+                          actor.name,
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w500,
@@ -140,9 +167,9 @@ class DetailsScreen extends StatelessWidget {
                               width: 5,
                             ),
                             Text(
-                              movie.voteAverage == 0.0
+                              actor.popularity == 0.0
                                   ? 'N/A'
-                                  : movie.voteAverage.toString(),
+                                  : actor.popularity.toString(),
                               style: const TextStyle(
                                 fontWeight: FontWeight.w400,
                                 color: Color(0xFFFF8700),
@@ -172,7 +199,7 @@ class DetailsScreen extends StatelessWidget {
                             width: 5,
                           ),
                           Text(
-                            movie.releaseDate.split('-')[0],
+                            actor.birthday,
                             style: const TextStyle(
                               fontWeight: FontWeight.w400,
                               fontSize: 10,
@@ -183,12 +210,12 @@ class DetailsScreen extends StatelessWidget {
                       const Text('|'),
                       Row(
                         children: [
-                          SvgPicture.asset('assets/Ticket.svg'),
+                          Icon(Icons.location_city,color:Colors.white),
                           const SizedBox(
                             width: 5,
                           ),
                           Text(
-                            Utils.getGenres(movie),
+                            actor.placeOfBirth,
                             style: const TextStyle(
                               fontWeight: FontWeight.w400,
                               fontSize: 10,
@@ -203,7 +230,7 @@ class DetailsScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(24),
                 child: DefaultTabController(
-                  length: 3,
+                  length: 2,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -214,9 +241,8 @@ class DetailsScreen extends StatelessWidget {
                             0xFF3A3F47,
                           ),
                           tabs: [
-                            Tab(text: 'About Movie'),
-                            Tab(text: 'Reviews'),
-                            Tab(text: 'Cast'),
+                            Tab(text: 'About Actor'),
+                            Tab(text: 'Movies'),
                           ]),
                       SizedBox(
                         height: 400,
@@ -225,7 +251,7 @@ class DetailsScreen extends StatelessWidget {
                             margin: const EdgeInsets.only(top: 20),
                             padding: const EdgeInsets.symmetric(horizontal: 10),
                             child: Text(
-                              movie.overview,
+                              actor.biography,
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 fontSize: 20,
@@ -233,89 +259,7 @@ class DetailsScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                          FutureBuilder<List<Review>?>(
-                            future: ApiService.getMovieReviews(movie.id),
-                            builder: (_, snapshot) {
-                              if (snapshot.hasData) {
-                                return snapshot.data!.isEmpty
-                                    ? const Padding(
-                                        padding: EdgeInsets.only(top: 30.0),
-                                        child: Text(
-                                          'No review',
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      )
-                                    : ListView.builder(
-                                        itemCount: snapshot.data!.length,
-                                        itemBuilder: (_, index) => Padding(
-                                          padding: const EdgeInsets.all(10.0),
-                                          child: Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Column(
-                                                children: [
-                                                  SvgPicture.asset(
-                                                    'assets/avatar.svg',
-                                                    height: 50,
-                                                    width: 50,
-                                                    // fit: BoxFit.cover,
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 15,
-                                                  ),
-                                                  Text(
-                                                    snapshot.data![index].rating
-                                                        .toString(),
-                                                    style: const TextStyle(
-                                                      color: Color(0xff0296E5),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                              const SizedBox(
-                                                width: 10,
-                                              ),
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    snapshot
-                                                        .data![index].author,
-                                                    style: const TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 10,
-                                                  ),
-                                                  SizedBox(
-                                                    width: 245,
-                                                    child: Text(snapshot
-                                                        .data![index].comment,
-                                                        style: const TextStyle(
-                                                          fontSize: 8,
-                                                          fontWeight:
-                                                            FontWeight.w400,
-                                                    ),),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                              } else {
-                                return const Center(
-                                  child: Text('Wait...'),
-                                );
-                              }
-                            },
-                          ),
-                          Container(),
+                          TabBuilder(future:ApiService.getMoviesFromActor(actor.id.toString())),
                         ]),
                       ),
                     ],

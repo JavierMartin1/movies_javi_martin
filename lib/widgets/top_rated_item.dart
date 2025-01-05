@@ -2,18 +2,20 @@ import 'package:fade_shimmer/fade_shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:movies/api/api.dart';
+import 'package:movies/models/actor.dart';
 import 'package:movies/models/movie.dart';
 import 'package:movies/screens/details_screen.dart';
+import 'package:movies/screens/details_screen_actor.dart';
 import 'package:movies/widgets/index_number.dart';
 
 class TopRatedItem extends StatelessWidget {
   const TopRatedItem({
     super.key,
-    required this.movie,
+    required this.actor,
     required this.index,
   });
 
-  final Movie movie;
+  final Actor actor;
   final int index;
   @override
   Widget build(BuildContext context) {
@@ -21,14 +23,14 @@ class TopRatedItem extends StatelessWidget {
       children: [
         GestureDetector(
           onTap: () => Get.to(
-            DetailsScreen(movie: movie),
+            DetailsScreenActor(actor: actor),
           ),
           child: Container(
             margin: const EdgeInsets.only(left: 12),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: Image.network(
-                Api.imageBaseUrl + movie.posterPath,
+                Api.imageBaseUrl + actor.profilePath,
                 fit: BoxFit.cover,
                 height: 250,
                 width: 180,
